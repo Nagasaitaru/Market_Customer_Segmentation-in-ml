@@ -1,3 +1,5 @@
+import os
+
 from src.data_preprocessing import load_data
 from src.data_preprocessing import preprocess_data
 
@@ -11,39 +13,48 @@ from src.clustering import apply_kmeans
 from src.visualization import plot_elbow
 from src.visualization import plot_clusters
 
+
 def main():
 
-    filepath="dataset/Mall_Customers.csv"
+    # Create outputs folder automatically
+    os.makedirs("outputs", exist_ok=True)
 
-    df=load_data(filepath)
+    filepath = "dataset/Mall_Customers.csv"
 
-    df=create_rfm(df)
+    df = load_data(filepath)
 
-    scaled_data,original_df=preprocess_data(df)
+    df = create_rfm(df)
 
-    wcss=elbow_method(scaled_data)
+    scaled_data, original_df = preprocess_data(df)
+
+    # Elbow Method
+    wcss = elbow_method(scaled_data)
 
     plot_elbow(wcss)
 
-    labels=apply_kmeans(scaled_data)
+    # KMeans Clustering
+    labels = apply_kmeans(scaled_data)
 
-    pca_data=apply_pca(scaled_data)
+    # PCA
+    pca_data = apply_pca(scaled_data)
 
-    original_df['Cluster']=labels
+    # Save cluster results
+    original_df["Cluster"] = labels
 
     original_df.to_csv(
         "outputs/cluster_report.csv",
         index=False
     )
 
+    # PCA Visualization
     plot_clusters(
         pca_data,
         labels
     )
 
-    print(
-        "Project Completed Successfully!"
-    )
+    print("Project Completed Successfully!")
+    print("Files saved in outputs folder")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
